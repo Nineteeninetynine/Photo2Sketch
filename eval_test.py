@@ -117,10 +117,13 @@ def eval():
     # LR_filename = os.path.join(opt.image_dataset, 'hazy')
     SR_filename = os.path.join(opt.image_dataset, 'our')
     # SLR_filename = os.path.join(opt.image_dataset, 'SLR')
+    PR_filename = os.path.join(opt.image_dataset, 'Predicted_photo') 
+
 
     gt_image = [join(HR_filename, x) for x in listdir(HR_filename) if is_image_file(x)]
     output_image = [join(SR_filename, x) for x in listdir(HR_filename) if is_image_file(x)]
     # slr_output_image = [join(SLR_filename, x) for x in listdir(HR_filename) if is_image_file(x)]
+    Predicted_photo = [join(PR_filename, x) for x in listdir(HR_filename) if is_image_file(x)]
 
     count = 0
     avg_psnr_predicted = 0.0
@@ -135,6 +138,7 @@ def eval():
             img = transform(HR).unsqueeze(0).to(device)
             feat = enc(img)
             prediction = dec(feat)
+            img_predict = inv(prediction)
             lpips_sp = loss_fn_alex_sp(prediction, img)
             lpips_sp = lpips_sp.mean()
         torch.cuda.empty_cache()
@@ -146,6 +150,12 @@ def eval():
         prediction = prediction.clamp(0, 255)
 
         Image.fromarray(np.uint8(prediction)).save(output_image[i])
+      
+        img_predict = img_predict.data[0].cpu().squeeze(0)
+        img_predict = img_predict * 255.0
+        img_predict = img_predict.clamp(0, 255)
+      
+        Image.fromarray(np.uint8(img_predict)).save(Predicted_photo[i])
 
         GT = np.array(HR).astype(np.float32)
         GT_Y = rgb2ycbcr(GT)
