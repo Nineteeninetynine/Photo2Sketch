@@ -118,7 +118,12 @@ def eval():
     SR_filename = os.path.join(opt.image_dataset, 'our')
     # SLR_filename = os.path.join(opt.image_dataset, 'SLR')
     PR_filename = os.path.join(opt.image_dataset, 'Predicted_photo') 
-
+    
+    # Create directories if they don't exist
+    os.makedirs(HR_filename, exist_ok=True)
+    os.makedirs(SR_filename, exist_ok=True)
+    os.makedirs(PR_filename, exist_ok=True)
+    # os.makedirs(SLR_filename, exist_ok=True)
 
     gt_image = [join(HR_filename, x) for x in listdir(HR_filename) if is_image_file(x)]
     output_image = [join(SR_filename, x) for x in listdir(HR_filename) if is_image_file(x)]
